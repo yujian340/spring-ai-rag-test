@@ -4,7 +4,6 @@ import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import org.elasticsearch.client.RestClient;
 import org.springframework.ai.autoconfigure.vectorstore.elasticsearch.ElasticsearchVectorStoreProperties;
 import org.springframework.ai.chat.client.ChatClient;
-import org.springframework.ai.chat.client.advisor.QuestionAnswerAdvisor;
 import org.springframework.ai.ollama.OllamaChatModel;
 import org.springframework.ai.ollama.OllamaEmbeddingModel;
 import org.springframework.ai.vectorstore.SimpleVectorStore;
@@ -43,8 +42,8 @@ public class RAGConfiguration {
         return nativeClient.get();
     }
 
-    @Bean
-    public ChatClient ragClient(OllamaChatModel ollamaChatModel, ElasticsearchVectorStore elasticsearchVectorStore) {
+    @Bean(name = "ragClient")
+    public ChatClient ragClient(OllamaChatModel ollamaChatModel) {
         return ChatClient.builder(ollamaChatModel).defaultSystem(
                         """
                                 你是一家名叫“xx信息科技”的知识库助手。
@@ -52,7 +51,6 @@ public class RAGConfiguration {
                                 如果答案不在文档信息中，你会准确的通知用户未找到匹配的内容。
                                 """
                 )
-                .defaultAdvisors((new QuestionAnswerAdvisor(elasticsearchVectorStore)))
                 .build();
     }
 }
