@@ -1,0 +1,47 @@
+spring:
+  elasticsearch:
+    uris: http://127.0.0.1:9200
+  application:
+    name: ai-rag
+  http:
+    client:
+      connect-timeout: 60s
+      read-timeout: 60s
+  servlet:
+    multipart:
+      max-file-size: 100MB
+      max-request-size: 200MB
+  ai:
+    ollama:
+      base-url: http://127.0.0.1:11434
+      chat:
+        options:
+          model: deepseek-r1:7b
+          temperature: 0.7
+      embedding:
+        model: nomic-embed-text:latest
+    vectorstore:
+      elasticsearch:
+        initialize-schema: true
+        index-name: my-ai-document-index
+        similarity: cosine
+        dimensions: 768
+server:
+  port: 8089
+  servlet:
+    context-path: /
+  undertow:
+    max-http-post-size: -1
+    buffer-size: 512
+    direct-buffers: true
+    threads:
+      io: 8
+      worker: 256
+cors:
+  filter:
+    disabled: true
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
