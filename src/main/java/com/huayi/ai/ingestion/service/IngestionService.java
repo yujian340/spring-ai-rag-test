@@ -9,7 +9,6 @@ import org.springframework.ai.autoconfigure.vectorstore.elasticsearch.Elasticsea
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.QuestionAnswerAdvisor;
 import org.springframework.ai.document.Document;
-import org.springframework.ai.ollama.OllamaChatModel;
 import org.springframework.ai.reader.tika.TikaDocumentReader;
 import org.springframework.ai.transformer.splitter.TokenTextSplitter;
 import org.springframework.ai.vectorstore.SearchRequest;
@@ -50,8 +49,6 @@ public class IngestionService {
 
     private final ElasticsearchVectorStore vectorStore;
 
-    private final OllamaChatModel chatModel;
-
     private final ChatClient ragClient;
 
     private final ElasticsearchClient elasticsearchClient;
@@ -68,12 +65,10 @@ public class IngestionService {
 
     public IngestionService(
             ElasticsearchVectorStore elasticsearchVectorStore,
-            OllamaChatModel chatModel,
             ElasticsearchClient elasticsearchClient,
             ElasticsearchVectorStoreProperties options,
             ChatClient ragClient) {
         this.vectorStore = elasticsearchVectorStore;
-        this.chatModel = chatModel;
         this.elasticsearchClient = elasticsearchClient;
         this.options = options;
         this.ragClient = ragClient;
@@ -239,8 +234,7 @@ public class IngestionService {
 //        String documents = vectorStoreResult.stream().map(Document::getText)
 //                .collect(Collectors.joining(System.lineSeparator()));
 //        logger.info(documents);
-        return ChatClient.builder(chatModel)
-                .build().prompt()
+        return ragClient.prompt()
                 .advisors(new QuestionAnswerAdvisor(vectorStore, searchRequest, promptTemplate))
                 .user(prompt)
                 .stream()
